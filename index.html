@@ -14,7 +14,7 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -22,253 +22,160 @@
         
         .container {
             background: rgba(255,255,255,0.98);
-            border-radius: 24px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 16px;
             width: 100%;
-            max-width: 450px;
+            max-width: 430px;
             box-shadow: 0 25px 80px rgba(0,0,0,0.4);
-            max-height: 95vh;
+            max-height: 98vh;
             overflow-y: auto;
         }
         
-        .header { text-align: center; margin-bottom: 15px; }
-        .header .icon { font-size: 42px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header .icon { font-size: 36px; }
         .header h1 { 
-            font-size: 20px; 
+            font-size: 17px; 
             font-weight: 700;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 5px 0; 
         }
-        .header p { color: #94a3b8; font-size: 12px; }
+        .header p { color: #94a3b8; font-size: 11px; }
         
-        /* STATS GRID - 4 kotak */
+        /* STATS 4 KOTAK */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 5px;
+            margin-bottom: 8px;
         }
         
         .stat-box {
             text-align: center;
-            padding: 12px 6px;
-            border-radius: 14px;
+            padding: 10px 4px;
+            border-radius: 10px;
             background: #f8fafc;
-            border: 1px solid #f1f5f9;
         }
         
-        .stat-box .num {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        
-        .stat-box .label {
-            font-size: 9px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-        
+        .stat-box .num { font-size: 18px; font-weight: 700; }
+        .stat-box .label { font-size: 8px; color: #94a3b8; text-transform: uppercase; }
         .stat-total .num { color: #6366f1; }
         .stat-hadir .num { color: #10b981; }
         .stat-belum .num { color: #f59e0b; }
         .stat-persen .num { color: #3b82f6; }
         
-        /* Progress bar */
+        /* PROGRESS BAR */
         .progress-wrap {
             background: #f1f5f9;
-            border-radius: 10px;
-            height: 8px;
-            margin: 8px 0 12px;
+            border-radius: 6px;
+            height: 6px;
+            margin-bottom: 10px;
             overflow: hidden;
         }
-        
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #10b981, #6366f1);
-            border-radius: 10px;
+            border-radius: 6px;
             transition: width 0.5s ease;
+            width: 0%;
         }
         
-        /* Camera */
+        /* CAMERA */
         .camera-box {
             background: #000;
-            border-radius: 16px;
-            margin: 10px 0;
-            min-height: 280px;
+            border-radius: 14px;
+            margin: 6px 0;
+            min-height: 250px;
             position: relative;
             overflow: hidden;
             border: 3px solid #6366f1;
         }
         
-        #reader { width: 100%; border-radius: 13px; overflow: hidden; }
-        #reader video { border-radius: 13px; object-fit: cover; }
+        #reader { width: 100%; border-radius: 11px; overflow: hidden; }
+        #reader video { border-radius: 11px; object-fit: cover; }
         
         .scanner-status {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px;
-            text-align: center;
-            z-index: 10;
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 12px; text-align: center; z-index: 10;
             pointer-events: none;
             background: linear-gradient(transparent, rgba(0,0,0,0.8));
         }
         
-        .scanner-status .ready {
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-        }
+        .scanner-status .ready { color: white; font-size: 12px; font-weight: 600; }
         
-        .scanner-status .dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse-dot 1.5s infinite;
-            margin-right: 8px;
+        .dot {
+            display: inline-block; width: 7px; height: 7px;
+            background: #10b981; border-radius: 50%;
+            animation: pulse-dot 1.5s infinite; margin-right: 6px;
         }
-        
         @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.5); }
+            0%,100%{opacity:1;transform:scale(1)}
+            50%{opacity:.4;transform:scale(1.5)}
         }
         
-        /* Flash */
+        /* FLASH */
         .flash-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 9999; pointer-events: none; opacity: 0;
         }
+        .flash-overlay.show { opacity: 0.6; }
         
-        .flash-overlay.show {
-            opacity: 0.6;
-            transition: opacity 0s;
-        }
-        
-        /* Notif */
-        .notif-area { margin-top: 12px; }
+        /* NOTIF */
+        .notif-area { margin-top: 8px; }
         
         .notif-area h3 {
-            font-size: 13px;
-            color: #1e293b;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 12px; color: #1e293b; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
         }
         
-        .notif-area h3 .live {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: blink 1s infinite;
+        .live {
+            width: 7px; height: 7px; background: #10b981;
+            border-radius: 50%; animation: blink 1s infinite;
         }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
         
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .notif-list {
-            list-style: none;
-            max-height: 250px;
-            overflow-y: auto;
-        }
+        .notif-list { list-style: none; max-height: 180px; overflow-y: auto; }
         
         .notif-list li {
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            animation: slideIn 0.3s ease;
+            padding: 10px; border-radius: 10px; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; animation: slideIn 0.3s ease;
         }
-        
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from{opacity:0;transform:translateY(-8px)}
+            to{opacity:1;transform:translateY(0)}
         }
         
-        .notif-list li.success {
-            background: #ecfdf5;
-            border-left: 4px solid #10b981;
-        }
-        
-        .notif-list li.error {
-            background: #fef2f2;
-            border-left: 4px solid #ef4444;
-        }
-        
-        .notif-list li.warning {
-            background: #fffbeb;
-            border-left: 4px solid #f59e0b;
-        }
+        .notif-list li.success { background: #ecfdf5; border-left: 3px solid #10b981; }
+        .notif-list li.error { background: #fef2f2; border-left: 3px solid #ef4444; }
+        .notif-list li.warning { background: #fffbeb; border-left: 3px solid #f59e0b; }
         
         .notif-list .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 30px; height: 30px; border-radius: 50%;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            flex-shrink: 0;
+            color: white; display: flex; align-items: center;
+            justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;
         }
-        
         .notif-list li.error .avatar { background: #ef4444; }
         .notif-list li.warning .avatar { background: #f59e0b; }
         
         .notif-list .info { flex: 1; min-width: 0; }
         .notif-list .nama { font-weight: 600; color: #1e293b; }
-        .notif-list .jabatan { font-size: 11px; color: #6366f1; font-weight: 500; }
-        .notif-list .pesan { font-size: 11px; color: #64748b; }
-        .notif-list .waktu { font-size: 10px; color: #94a3b8; }
+        .notif-list .jabatan { font-size: 10px; color: #6366f1; font-weight: 500; }
+        .notif-list .pesan { font-size: 10px; color: #64748b; }
+        .notif-list .waktu { font-size: 9px; color: #94a3b8; }
+        .notif-list .icon-status { font-size: 18px; flex-shrink: 0; }
         
-        .notif-list .icon-status { font-size: 22px; flex-shrink: 0; }
+        .empty-notif { text-align: center; color: #94a3b8; font-size: 11px; padding: 12px; }
         
-        .empty-notif { 
-            text-align: center; 
-            color: #94a3b8; 
-            font-size: 12px; 
-            padding: 20px; 
-        }
-        
-        /* Buttons */
+        /* BUTTONS */
         .btn {
-            display: block; width: 100%; padding: 14px; border: none; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            font-family: inherit; margin: 8px 0; transition: all 0.2s;
+            display: block; width: 100%; padding: 13px; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            font-family: inherit; margin: 5px 0; transition: all 0.2s;
         }
-        
-        .btn-camera { 
-            background: linear-gradient(135deg, #10b981, #059669); 
-            color: white; 
-            font-size: 16px; 
-            padding: 16px;
-            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
-        }
-        
-        .btn-outline { 
-            background: white; 
-            color: #6366f1; 
-            border: 2px solid #e2e8f0; 
-        }
+        .btn-camera { background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 15px; padding: 14px; }
+        .btn-outline { background: white; color: #6366f1; border: 2px solid #e2e8f0; }
     </style>
 </head>
 <body>
@@ -279,55 +186,29 @@
             <p>Scan → Langsung Hadir ✅</p>
         </div>
         
-        <!-- STATS: Total, Hadir, Belum, Persentase -->
+        <!-- STATS -->
         <div class="stats-grid">
-            <div class="stat-box stat-total">
-                <div class="num" id="totalPeserta">0</div>
-                <div class="label">👥 Peserta</div>
-            </div>
-            <div class="stat-box stat-hadir">
-                <div class="num" id="totalHadir">0</div>
-                <div class="label">✅ Hadir</div>
-            </div>
-            <div class="stat-box stat-belum">
-                <div class="num" id="totalBelum">0</div>
-                <div class="label">⏳ Belum</div>
-            </div>
-            <div class="stat-box stat-persen">
-                <div class="num" id="persentase">0%</div>
-                <div class="label">📈 Hadir</div>
-            </div>
+            <div class="stat-box stat-total"><div class="num" id="totalPeserta">0</div><div class="label">Peserta</div></div>
+            <div class="stat-box stat-hadir"><div class="num" id="totalHadir">0</div><div class="label">Hadir</div></div>
+            <div class="stat-box stat-belum"><div class="num" id="totalBelum">0</div><div class="label">Belum</div></div>
+            <div class="stat-box stat-persen"><div class="num" id="persentase">0%</div><div class="label">% Hadir</div></div>
         </div>
         
-        <!-- Progress Bar -->
-        <div class="progress-wrap">
-            <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
-        </div>
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
         
-        <!-- Camera -->
+        <!-- CAMERA -->
         <div class="camera-box" id="cameraBox">
             <div id="reader"></div>
-            <div class="scanner-status">
-                <div class="ready" id="scannerStatus">
-                    <span class="dot"></span> Arahkan QR Code
-                </div>
-            </div>
+            <div class="scanner-status"><div class="ready" id="scannerStatus"><span class="dot"></span> Arahkan QR Code</div></div>
         </div>
         
-        <button id="btnCamera" class="btn btn-camera" onclick="startCamera()">
-            📸 Mulai Kamera
-        </button>
+        <button id="btnCamera" class="btn btn-camera" onclick="startCamera()">📸 Mulai Kamera</button>
+        <button id="btnRetry" class="btn btn-outline" onclick="startCamera()" style="display:none;">🔄 Mulai Ulang</button>
         
-        <button id="btnRetry" class="btn btn-outline" onclick="startCamera()" style="display:none;">
-            🔄 Mulai Ulang
-        </button>
-        
-        <!-- Notifikasi -->
+        <!-- NOTIF -->
         <div class="notif-area">
-            <h3><span class="live"></span> Notifikasi Real-time</h3>
-            <ul class="notif-list" id="notifList">
-                <li class="empty-notif">📭 Menunggu scan QR...</li>
-            </ul>
+            <h3><span class="live"></span> Notifikasi</h3>
+            <ul class="notif-list" id="notifList"><li class="empty-notif">📭 Menunggu scan QR...</li></ul>
         </div>
     </div>
     
@@ -339,61 +220,90 @@
         let scanner = null;
         let isProcessing = false;
         let notifList = [];
+        let pesertaCache = {}; // Cache peserta: nip -> {nama, jabatan}
         
         function flash() {
             const el = document.getElementById('flashOverlay');
             el.classList.add('show');
-            setTimeout(function() { el.classList.remove('show'); }, 150);
+            setTimeout(() => el.classList.remove('show'), 150);
         }
         
         function callAPI(action, params) {
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve, reject) => {
                 const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
                 
-                window[cb] = function(r) {
+                window[cb] = r => {
                     delete window[cb];
                     const s = document.getElementById(cb);
                     if (s) s.remove();
                     resolve(r);
                 };
                 
-                const qs = Object.keys(params).map(function(k) {
-                    return k + '=' + encodeURIComponent(params[k]);
-                }).join('&');
-                
+                const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
                 const url = API_URL + '?action=' + action + '&callback=' + cb + '&' + qs;
                 
                 const s = document.createElement('script');
                 s.id = cb;
                 s.src = url;
-                s.onerror = function() { delete window[cb]; reject(new Error('Network')); };
+                s.onerror = () => { delete window[cb]; reject(new Error('Network')); };
                 document.body.appendChild(s);
                 
-                setTimeout(function() {
-                    if (window[cb]) { delete window[cb]; reject(new Error('Timeout')); }
-                }, 10000);
+                setTimeout(() => { if (window[cb]) { delete window[cb]; reject(new Error('Timeout')); } }, 10000);
             });
         }
         
-        // Update stats dari API
+        // ============================================
+        // UPDATE STATS
+        // ============================================
         async function updateStats() {
             try {
                 const r = await callAPI('getStats', {});
+                console.log('STATS RESULT:', JSON.stringify(r));
+                
                 if (r.success) {
-                    document.getElementById('totalPeserta').textContent = r.totalPeserta;
-                    document.getElementById('totalHadir').textContent = r.totalHadir;
-                    document.getElementById('totalBelum').textContent = r.totalBelum;
-                    document.getElementById('persentase').textContent = r.persentase + '%';
-                    document.getElementById('progressBar').style.width = r.persentase + '%';
+                    document.getElementById('totalPeserta').textContent = r.totalPeserta || 0;
+                    document.getElementById('totalHadir').textContent = r.totalHadir || 0;
+                    document.getElementById('totalBelum').textContent = r.totalBelum || 0;
+                    document.getElementById('persentase').textContent = (r.persentase || 0) + '%';
+                    document.getElementById('progressBar').style.width = (r.persentase || 0) + '%';
+                    
+                    console.log('✅ Stats updated: ' + r.totalHadir + '/' + r.totalPeserta);
+                } else {
+                    console.log('❌ Stats API failed:', r.message);
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.log('❌ Stats error:', e.message);
+            }
         }
         
-        // Tambah notif dengan NAMA + JABATAN
+        // ============================================
+        // LOAD PESERTA CACHE (untuk jabatan)
+        // ============================================
+        async function loadPesertaCache() {
+            try {
+                const r = await callAPI('getPeserta', {});
+                if (r.success) {
+                    pesertaCache = {};
+                    r.data.forEach(p => {
+                        pesertaCache[p.nip] = { nama: p.nama, jabatan: p.jabatan || '' };
+                    });
+                    console.log('✅ Peserta cache loaded: ' + Object.keys(pesertaCache).length);
+                }
+            } catch(e) {
+                console.log('❌ Cache error:', e.message);
+            }
+        }
+        
+        // ============================================
+        // ADD NOTIF
+        // ============================================
         function addNotif(nama, jabatan, msg, type) {
             const waktu = new Date().toLocaleTimeString('id-ID');
             
-            notifList.unshift({ nama, jabatan, msg, waktu, type });
+            // Hindari duplikat dalam 1 detik
+            if (notifList.length > 0 && notifList[0].nama === nama && notifList[0].type === type) return;
+            
+            notifList.unshift({ nama, jabatan: jabatan || '', msg, waktu, type });
             if (notifList.length > 50) notifList = notifList.slice(0, 50);
             
             renderNotif();
@@ -407,32 +317,35 @@
                 return;
             }
             
-            let html = '';
-            for (let i = 0; i < notifList.length; i++) {
-                const n = notifList[i];
+            list.innerHTML = notifList.map(n => {
                 const icon = n.type === 'success' ? '✅' : n.type === 'warning' ? '⚠️' : '❌';
-                
-                html += '<li class="' + n.type + '">';
-                html += '<div class="avatar">' + (n.nama ? n.nama.charAt(0) : '?') + '</div>';
-                html += '<div class="info">';
-                html += '<div class="nama">' + (n.nama || '-') + '</div>';
-                if (n.jabatan) html += '<div class="jabatan">' + n.jabatan + '</div>';
-                html += '<div class="pesan">' + n.msg + '</div>';
-                html += '<div class="waktu">' + n.waktu + '</div>';
-                html += '</div>';
-                html += '<div class="icon-status">' + icon + '</div>';
-                html += '</li>';
-            }
-            list.innerHTML = html;
+                return `
+                    <li class="${n.type}">
+                        <div class="avatar">${n.nama ? n.nama.charAt(0) : '?'}</div>
+                        <div class="info">
+                            <div class="nama">${n.nama || '-'}</div>
+                            ${n.jabatan ? '<div class="jabatan">' + n.jabatan + '</div>' : ''}
+                            <div class="pesan">${n.msg}</div>
+                            <div class="waktu">${n.waktu}</div>
+                        </div>
+                        <div class="icon-status">${icon}</div>
+                    </li>
+                `;
+            }).join('');
         }
         
+        // ============================================
+        // RESUME SCANNER
+        // ============================================
         function resumeScanner() {
             isProcessing = false;
             document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> Arahkan QR Code';
-            if (scanner) scanner.resume().catch(function() { startCamera(); });
+            if (scanner) scanner.resume().catch(() => startCamera());
         }
         
+        // ============================================
         // AUTO ABSEN
+        // ============================================
         async function autoAbsen(decodedText) {
             if (isProcessing) return;
             
@@ -440,6 +353,7 @@
             flash();
             document.getElementById('scannerStatus').innerHTML = '⏳ Memproses...';
             
+            // Decode QR
             let nip = '', nama = '';
             
             try {
@@ -460,33 +374,40 @@
                 return;
             }
             
+            // Cek apakah sudah absen
+            try {
+                const stats = await callAPI('getStats', {});
+                // Tidak perlu cek di sini, API yang handle
+            } catch(e) {}
+            
             // Check-in
             try {
                 const result = await callAPI('checkIn', { nip, nama, lat: '', lng: '' });
                 
-                if (result.success) {
-                    // Ambil data peserta untuk dapat jabatan
-                    const pesertaData = await callAPI('getPeserta', {});
-                    let jabatan = '';
-                    if (pesertaData.success) {
-                        for (let i = 0; i < pesertaData.data.length; i++) {
-                            if (pesertaData.data[i].nip === nip) {
-                                jabatan = pesertaData.data[i].jabatan || '';
-                                break;
-                            }
-                        }
-                    }
-                    
-                    addNotif(nama, jabatan, result.message, 'success');
+                // Dapatkan jabatan dari cache atau API
+                let jabatan = '';
+                if (pesertaCache[nip]) {
+                    jabatan = pesertaCache[nip].jabatan;
                 } else {
-                    if (result.alreadyAbsen) {
-                        addNotif(nama, '', 'Sudah absen sebelumnya', 'warning');
-                    } else {
-                        addNotif(nama, '', result.message, 'error');
-                    }
+                    // Fallback: ambil dari API
+                    try {
+                        const pData = await callAPI('getPeserta', {});
+                        if (pData.success) {
+                            const found = pData.data.find(p => p.nip === nip);
+                            if (found) jabatan = found.jabatan || '';
+                        }
+                    } catch(e) {}
                 }
                 
-                // Update stats setiap kali ada scan
+                if (result.success) {
+                    addNotif(nama, jabatan, result.message, 'success');
+                } else if (result.alreadyAbsen) {
+                    addNotif(nama, jabatan, 'Sudah absen sebelumnya', 'warning');
+                } else {
+                    addNotif(nama, jabatan, result.message, 'error');
+                }
+                
+                // UPDATE STATS SETELAH SCAN
                 updateStats();
                 
             } catch(e) {
@@ -497,7 +418,9 @@
             setTimeout(resumeScanner, 800);
         }
         
+        // ============================================
         // CAMERA
+        // ============================================
         async function startCamera() {
             document.getElementById('btnCamera').style.display = 'none';
             document.getElementById('btnRetry').style.display = 'none';
@@ -512,7 +435,7 @@
             
             document.getElementById('reader').innerHTML = '';
             
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            if (!navigator.mediaDevices?.getUserMedia) {
                 addNotif('System', '', 'Browser tidak support', 'error');
                 document.getElementById('btnRetry').style.display = 'block';
                 return;
@@ -520,15 +443,15 @@
             
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                stream.getTracks().forEach(function(t) { t.stop(); });
+                stream.getTracks().forEach(t => t.stop());
                 
                 scanner = new Html5Qrcode("reader");
                 
                 await scanner.start(
                     { facingMode: 'environment' },
                     { fps: 10, qrbox: { width: 250, height: 250 } },
-                    function(text) { scanner.pause(); autoAbsen(text); },
-                    function() {}
+                    text => { scanner.pause(); autoAbsen(text); },
+                    () => {}
                 );
                 
                 document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> Arahkan QR Code';
@@ -540,12 +463,19 @@
             }
         }
         
+        // ============================================
         // INIT
-        window.addEventListener('load', function() {
-            // Load stats awal
+        // ============================================
+        window.addEventListener('load', async () => {
+            console.log('🚀 Page loaded');
+            
+            // Load peserta cache dulu
+            await loadPesertaCache();
+            
+            // Load stats
             updateStats();
             
-            // Auto camera untuk mobile
+            // Auto camera mobile
             if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
                 setTimeout(startCamera, 600);
             }
@@ -554,12 +484,12 @@
             setInterval(updateStats, 15000);
         });
         
-        document.addEventListener('visibilitychange', function() {
+        document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 if (scanner) scanner.pause();
             } else {
                 if (scanner && !isProcessing) {
-                    scanner.resume().catch(function() { startCamera(); });
+                    scanner.resume().catch(() => startCamera());
                     updateStats();
                 }
             }
