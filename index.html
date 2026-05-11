@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Absensi QR - Auto Scan</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,30 +31,62 @@
             overflow-y: auto;
         }
         
-        .header { text-align: center; margin-bottom: 10px; }
+        .header { text-align: center; margin-bottom: 15px; }
         .header .icon { font-size: 40px; }
         .header h1 { color: #667eea; font-size: 18px; margin: 5px 0; }
         .header p { color: #666; font-size: 12px; }
         
-        /* Camera */
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; }
-        #reader video { border-radius: 15px; }
-        
-        .camera-box { 
-            background: #000; border-radius: 15px; margin: 10px 0; 
-            min-height: 280px; position: relative;
+        /* Counter */
+        .counter-row {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 14px;
+            margin-bottom: 12px;
         }
         
-        /* Scanner overlay */
+        .counter-row .count-item { flex: 1; }
+        .counter-row .count {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        
+        .counter-row .count-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .count-success .count { color: #10b981; }
+        .count-error .count { color: #ef4444; }
+        .count-total .count { color: #6366f1; }
+        
+        /* Camera */
+        .camera-box {
+            background: #000;
+            border-radius: 16px;
+            margin: 10px 0;
+            min-height: 280px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #reader { width: 100%; border-radius: 16px; overflow: hidden; }
+        #reader video { border-radius: 16px; object-fit: cover; }
+        
         .scanner-status {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 15px;
+            padding: 16px;
             text-align: center;
             z-index: 10;
             pointer-events: none;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
         }
         
         .scanner-status .ready {
@@ -64,7 +96,7 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
         
-        .scanner-status .ready .dot {
+        .scanner-status .dot {
             display: inline-block;
             width: 10px;
             height: 10px;
@@ -76,10 +108,10 @@
         
         @keyframes pulse-dot {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.3); }
+            50% { opacity: 0.4; transform: scale(1.4); }
         }
         
-        /* Flash effect */
+        /* Flash */
         .flash-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -95,10 +127,8 @@
             transition: opacity 0s;
         }
         
-        /* NOTIF AREA */
-        .notif-area {
-            margin-top: 15px;
-        }
+        /* Notif */
+        .notif-area { margin-top: 12px; }
         
         .notif-area h3 {
             font-size: 13px;
@@ -112,7 +142,7 @@
         .notif-area h3 .live-dot {
             width: 8px;
             height: 8px;
-            background: #28a745;
+            background: #10b981;
             border-radius: 50%;
             animation: blink 1s infinite;
         }
@@ -124,13 +154,13 @@
         
         .notif-list {
             list-style: none;
-            max-height: 250px;
+            max-height: 220px;
             overflow-y: auto;
         }
         
         .notif-list li {
             padding: 10px 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 4px;
             display: flex;
             align-items: center;
@@ -145,20 +175,25 @@
         }
         
         .notif-list li.success {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
         }
         
         .notif-list li.error {
-            background: #f8d7da;
-            border-left: 4px solid #dc3545;
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .notif-list li.warning {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
         }
         
         .notif-list .avatar {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: #667eea;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             display: flex;
             align-items: center;
@@ -168,78 +203,34 @@
             flex-shrink: 0;
         }
         
-        .notif-list li.error .avatar {
-            background: #dc3545;
-        }
+        .notif-list li.error .avatar { background: #ef4444; }
+        .notif-list li.warning .avatar { background: #f59e0b; }
         
-        .notif-list .info { flex: 1; }
-        .notif-list .nama { font-weight: 600; color: #333; }
-        .notif-list .msg { font-size: 11px; color: #666; }
+        .notif-list .info { flex: 1; min-width: 0; }
+        .notif-list .nama { font-weight: 600; color: #1e293b; }
+        .notif-list .jabatan { font-size: 11px; color: #6366f1; font-weight: 500; }
+        .notif-list .msg { font-size: 11px; color: #64748b; }
         
-        .notif-list .icon-status {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .empty-notif {
-            text-align: center;
-            color: #999;
-            font-size: 12px;
-            padding: 15px;
-        }
+        .notif-list .icon-status { font-size: 20px; flex-shrink: 0; }
         
         /* Buttons */
         .btn {
-            display: block; width: 100%; padding: 12px; border: none; border-radius: 10px;
+            display: block; width: 100%; padding: 12px; border: none; border-radius: 12px;
             font-size: 14px; font-weight: 600; cursor: pointer;
             font-family: inherit; margin: 8px 0; transition: all 0.2s;
         }
         
         .btn:active { transform: scale(0.98); }
-        .btn-camera { background: #28a745; color: white; font-size: 15px; padding: 14px; }
-        .btn-outline { background: white; color: #667eea; border: 2px solid #667eea; }
+        .btn-camera { background: #10b981; color: white; font-size: 15px; padding: 14px; }
+        .btn-outline { background: white; color: #6366f1; border: 2px solid #e2e8f0; }
         
-        /* Counter */
-        .counter-box {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
+        .empty-notif { text-align: center; color: #94a3b8; font-size: 12px; padding: 15px; }
         
-        .counter-box .count {
-            font-size: 24px;
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        .counter-box .label {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-        }
-        
-        /* Test mode */
-        .test-mode {
-            background: #fff3cd;
-            color: #856404;
-            text-align: center;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: none;
-        }
-        
+        /* Debug */
         .debug-panel {
             background: #1e1e1e; color: #0f0; padding: 8px; border-radius: 8px;
-            font-family: monospace; font-size: 10px; margin-top: 8px;
-            max-height: 80px; overflow-y: auto; line-height: 1.4;
-            display: none;
+            font-family: monospace; font-size: 9px; margin-top: 8px;
+            max-height: 60px; overflow-y: auto; display: none;
         }
     </style>
 </head>
@@ -247,26 +238,23 @@
     <div class="container">
         <div class="header">
             <div class="icon">📱</div>
-            <h1>Scan QR - Auto Absen</h1>
-            <p>Scan QR → Langsung Absen ✅</p>
+            <h1>Scan QR · Auto Absen</h1>
+            <p>Scan → Langsung Hadir ✅</p>
         </div>
         
-        <!-- Test mode indicator -->
-        <div class="test-mode" id="testMode">⚠️ TEST MODE: Klik 2x untuk test manual</div>
-        
         <!-- Counter -->
-        <div class="counter-box">
-            <div>
+        <div class="counter-row">
+            <div class="count-item count-success">
                 <div class="count" id="countSuccess">0</div>
-                <div class="label">✅ Sukses</div>
+                <div class="count-label">✅ Sukses</div>
             </div>
-            <div>
+            <div class="count-item count-error">
                 <div class="count" id="countError">0</div>
-                <div class="label">❌ Gagal</div>
+                <div class="count-label">❌ Gagal</div>
             </div>
-            <div>
-                <div class="count" id="countTotal">0</div>
-                <div class="label">📊 Total</div>
+            <div class="count-item count-total">
+                <div class="count" id="countHadir">0</div>
+                <div class="count-label">👥 Hadir</div>
             </div>
         </div>
         
@@ -288,7 +276,7 @@
             🔄 Mulai Ulang Kamera
         </button>
         
-        <!-- NOTIF AREA -->
+        <!-- Notif -->
         <div class="notif-area">
             <h3><span class="live-dot"></span> Notifikasi</h3>
             <ul class="notif-list" id="notifList">
@@ -296,68 +284,78 @@
             </ul>
         </div>
         
-        <div class="debug-panel" id="debugPanel">🔍 Ready</div>
+        <div class="debug-panel" id="debugPanel"></div>
     </div>
     
-    <!-- Flash overlay -->
     <div class="flash-overlay" id="flashOverlay"></div>
 
     <script>
-        // ⚠️ GANTI URL INI
         const API_URL = 'https://script.google.com/macros/s/AKfycbzxSCaZecBS6Dfq6Y0WwZMSjjSqUWMcS084fgUqef_8dfFzAzNpozPv8WgmQEZtC9Gg/exec';
         
         let scanner = null;
         let isProcessing = false;
         let countSuccess = 0;
         let countError = 0;
+        let hadirSet = {}; // Track yang sudah sukses
         let notifList = [];
         
         // LOG
-        function log(msg, cls) {
+        function log(msg) {
             const p = document.getElementById('debugPanel');
             p.style.display = 'block';
-            p.innerHTML += `<br><span style="color:${cls==='err'?'#f44':cls==='ok'?'#0f0':'#fff'}">[${new Date().toLocaleTimeString()}] ${msg}</span>`;
+            p.innerHTML += '<br>' + msg;
             p.scrollTop = p.scrollHeight;
             console.log(msg);
-        }
-        
-        // API CALL
-        function callAPI(action, params) {
-            return new Promise((resolve, reject) => {
-                const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-                
-                window[cb] = r => {
-                    delete window[cb];
-                    const s = document.getElementById(cb);
-                    if (s) s.remove();
-                    resolve(r);
-                };
-                
-                const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
-                const url = API_URL + '?action=' + action + '&callback=' + cb + '&' + qs;
-                
-                const s = document.createElement('script');
-                s.id = cb;
-                s.src = url;
-                s.onerror = () => { delete window[cb]; reject(new Error('Network')); };
-                document.body.appendChild(s);
-                
-                setTimeout(() => { if (window[cb]) { delete window[cb]; reject(new Error('Timeout')); } }, 10000);
-            });
         }
         
         // FLASH
         function flash() {
             const el = document.getElementById('flashOverlay');
             el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 150);
+            setTimeout(function() { el.classList.remove('show'); }, 150);
         }
         
-        // NOTIF
-        function addNotif(nama, msg, type) {
+        // API CALL
+        function callAPI(action, params) {
+            return new Promise(function(resolve, reject) {
+                const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+                
+                window[cb] = function(r) {
+                    delete window[cb];
+                    const s = document.getElementById(cb);
+                    if (s) s.remove();
+                    resolve(r);
+                };
+                
+                const qs = Object.keys(params).map(function(k) {
+                    return k + '=' + encodeURIComponent(params[k]);
+                }).join('&');
+                
+                const url = API_URL + '?action=' + action + '&callback=' + cb + '&' + qs;
+                
+                const s = document.createElement('script');
+                s.id = cb;
+                s.src = url;
+                s.onerror = function() {
+                    delete window[cb];
+                    reject(new Error('Network'));
+                };
+                document.body.appendChild(s);
+                
+                setTimeout(function() {
+                    if (window[cb]) { delete window[cb]; reject(new Error('Timeout')); }
+                }, 10000);
+            });
+        }
+        
+        // ADD NOTIF
+        function addNotif(nama, jabatan, msg, type) {
             const waktu = new Date().toLocaleTimeString('id-ID');
             
-            notifList.unshift({ nama, msg, waktu, type });
+            // Jangan duplikat notif untuk orang yang sama dalam 2 detik
+            if (notifList.length > 0 && notifList[0].nama === nama && notifList[0].type === type) return;
+            
+            notifList.unshift({ nama, jabatan, msg, waktu, type });
             if (notifList.length > 50) notifList = notifList.slice(0, 50);
             
             renderNotif();
@@ -371,46 +369,41 @@
                 return;
             }
             
-            list.innerHTML = notifList.map((n, i) => `
-                <li class="${n.type}" style="animation-delay:${i*0.05}s">
-                    <div class="avatar">${n.nama ? n.nama.charAt(0) : '?'}</div>
-                    <div class="info">
-                        <div class="nama">${n.nama || '-'}</div>
-                        <div class="msg">${n.msg} · ${n.waktu}</div>
-                    </div>
-                    <div class="icon-status">${n.type === 'success' ? '✅' : '❌'}</div>
-                </li>
-            `).join('');
+            let html = '';
+            for (let i = 0; i < notifList.length; i++) {
+                const n = notifList[i];
+                html += '<li class="' + n.type + '">';
+                html += '<div class="avatar">' + (n.nama ? n.nama.charAt(0) : '?') + '</div>';
+                html += '<div class="info">';
+                html += '<div class="nama">' + (n.nama || '-') + '</div>';
+                if (n.jabatan) html += '<div class="jabatan">' + n.jabatan + '</div>';
+                html += '<div class="msg">' + n.msg + ' · ' + n.waktu + '</div>';
+                html += '</div>';
+                html += '<div class="icon-status">' + (n.type === 'success' ? '✅' : n.type === 'warning' ? '⚠️' : '❌') + '</div>';
+                html += '</li>';
+            }
+            list.innerHTML = html;
         }
         
         // UPDATE COUNTER
         function updateCounter() {
             document.getElementById('countSuccess').textContent = countSuccess;
             document.getElementById('countError').textContent = countError;
-            document.getElementById('countTotal').textContent = countSuccess + countError;
+            document.getElementById('countHadir').textContent = Object.keys(hadirSet).length;
         }
         
         // RESUME SCANNER
         function resumeScanner() {
             isProcessing = false;
             document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> Arahkan QR Code';
-            
-            if (scanner) {
-                scanner.resume().catch(() => {
-                    // Jika resume gagal, restart
-                    startCamera();
-                });
-            }
+            if (scanner) scanner.resume().catch(function() { startCamera(); });
         }
         
         // ============================================
         // AUTO ABSEN
         // ============================================
         async function autoAbsen(decodedText) {
-            if (isProcessing) {
-                log('Masih processing, skip...');
-                return;
-            }
+            if (isProcessing) return;
             
             isProcessing = true;
             flash();
@@ -424,30 +417,27 @@
                 const decoded = JSON.parse(atob(decodedText));
                 
                 if (decoded.type === 'personal_qr' && decoded.nip && decoded.nama) {
-                    // Personal QR - auto absen langsung
                     nip = decoded.nip;
                     nama = decoded.nama;
-                } else if (decoded.type === 'session_qr') {
-                    // Session QR - perlu input manual
-                    log('Session QR detected, need manual input');
-                    addNotif('QR Sesi', 'QR ini perlu input manual NIP & Nama', 'error');
-                    countError++;
-                    updateCounter();
-                    document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> Gunakan QR Personal';
-                    isProcessing = false;
-                    return;
                 } else {
-                    log('Unknown QR type');
-                    addNotif('?', 'QR tidak dikenali', 'error');
+                    addNotif('?', '', 'QR tidak dikenali', 'error');
                     countError++;
                     updateCounter();
                     resumeScanner();
                     return;
                 }
             } catch(e) {
-                log('Decode error: ' + e.message);
-                addNotif('?', 'QR tidak valid', 'error');
+                addNotif('?', '', 'QR tidak valid', 'error');
                 countError++;
+                updateCounter();
+                resumeScanner();
+                return;
+            }
+            
+            // Cek apakah sudah pernah sukses absen
+            if (hadirSet[nip]) {
+                addNotif(nama, '', 'Sudah absen sebelumnya', 'warning');
+                // TIDAK menambah counter error
                 updateCounter();
                 resumeScanner();
                 return;
@@ -455,27 +445,28 @@
             
             // Auto check-in
             try {
-                log(`Auto check-in: ${nip} - ${nama}`);
+                log('Auto check-in: ' + nip + ' - ' + nama);
                 const result = await callAPI('checkIn', { nip, nama, lat: '', lng: '' });
                 
                 if (result.success) {
-                    addNotif(nama, result.message, 'success');
+                    hadirSet[nip] = true;
                     countSuccess++;
-                    log(`✅ ${nama} - SUCCESS`);
+                    addNotif(nama, '', result.message, 'success');
                 } else {
-                    addNotif(nama, result.message, 'error');
-                    countError++;
-                    log(`❌ ${nama} - ${result.message}`);
+                    if (result.alreadyAbsen) {
+                        addNotif(nama, '', 'Sudah absen', 'warning');
+                        // TIDAK menambah counter
+                    } else {
+                        countError++;
+                        addNotif(nama, '', result.message, 'error');
+                    }
                 }
             } catch(e) {
-                log('API error: ' + e.message, 'err');
-                addNotif(nama, 'Gagal terhubung', 'error');
                 countError++;
+                addNotif(nama, '', 'Gagal terhubung', 'error');
             }
             
             updateCounter();
-            
-            // RESUME scanner untuk peserta berikutnya
             setTimeout(resumeScanner, 800);
         }
         
@@ -490,7 +481,6 @@
             document.getElementById('cameraBox').style.display = 'block';
             document.getElementById('scannerStatus').innerHTML = '⏳ Membuka kamera...';
             
-            // Cleanup old
             if (scanner) {
                 try { await scanner.stop(); } catch(e) {}
                 try { scanner.clear(); } catch(e) {}
@@ -499,39 +489,35 @@
             
             document.getElementById('reader').innerHTML = '';
             
-            if (!navigator.mediaDevices?.getUserMedia) {
-                log('No camera API', 'err');
-                addNotif('System', 'Browser tidak support kamera', 'error');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                addNotif('System', '', 'Browser tidak support kamera', 'error');
                 document.getElementById('btnRetry').style.display = 'block';
                 return;
             }
             
             try {
-                // Test camera
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                stream.getTracks().forEach(t => t.stop());
-                log('Camera OK', 'ok');
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                stream.getTracks().forEach(function(t) { t.stop(); });
                 
                 scanner = new Html5Qrcode("reader");
                 
                 await scanner.start(
                     { facingMode: 'environment' },
                     { fps: 10, qrbox: { width: 250, height: 250 } },
-                    (text) => {
-                        // QR Detected!
-                        log('QR Detected', 'ok');
+                    function(text) {
                         scanner.pause();
                         autoAbsen(text);
                     },
-                    () => {} // ignore scan failures
+                    function() {}
                 );
                 
-                log('Scanner active', 'ok');
                 document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> Arahkan QR Code';
                 
             } catch(err) {
-                log('Camera error: ' + err.message, 'err');
-                addNotif('System', 'Gagal akses kamera: ' + err.message, 'error');
+                log('Camera error: ' + err.message);
+                addNotif('System', '', 'Gagal akses kamera', 'error');
                 document.getElementById('cameraBox').style.display = 'none';
                 document.getElementById('btnRetry').style.display = 'block';
             }
@@ -540,28 +526,19 @@
         // ============================================
         // INIT
         // ============================================
-        window.addEventListener('load', () => {
-            log('🚀 Auto Scan Ready');
+        window.addEventListener('load', function() {
+            log('Ready');
             
             if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-                log('Mobile - auto start');
                 setTimeout(startCamera, 600);
             }
         });
         
-        // Handle page visibility
-        document.addEventListener('visibilitychange', () => {
+        document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 if (scanner) scanner.pause();
             } else {
-                if (scanner && !isProcessing) scanner.resume();
-            }
-        });
-        
-        // Handle app resume (HP)
-        window.addEventListener('focus', () => {
-            if (scanner && !isProcessing) {
-                scanner.resume().catch(() => startCamera());
+                if (scanner && !isProcessing) scanner.resume().catch(function() { startCamera(); });
             }
         });
     </script>
