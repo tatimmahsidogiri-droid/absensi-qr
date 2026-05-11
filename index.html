@@ -6,390 +6,130 @@
     <title>Absensi QR - Auto Scan</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .container {
-            background: rgba(255,255,255,0.98);
-            border-radius: 20px;
-            padding: 16px;
-            width: 100%;
-            max-width: 430px;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
-            max-height: 98vh;
-            overflow-y: auto;
-        }
-        
-        .header { text-align: center; margin-bottom: 8px; }
-        .header .icon { font-size: 34px; }
-        .header h1 { 
-            font-size: 17px; font-weight: 700;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .header p { color: #94a3b8; font-size: 11px; }
-        
-        /* STATS */
-        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; margin-bottom: 8px; }
-        .stat-box { text-align: center; padding: 8px 4px; border-radius: 10px; background: #f8fafc; }
-        .stat-box .num { font-size: 16px; font-weight: 700; }
-        .stat-box .label { font-size: 7px; color: #94a3b8; text-transform: uppercase; }
-        .stat-total .num { color: #6366f1; }
-        .stat-hadir .num { color: #10b981; }
-        .stat-belum .num { color: #f59e0b; }
-        .stat-persen .num { color: #3b82f6; }
-        
-        .progress-wrap { background: #f1f5f9; border-radius: 6px; height: 5px; margin-bottom: 8px; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #10b981, #6366f1); border-radius: 6px; transition: width 0.5s ease; width: 0%; }
-        
-        /* CAMERA */
-        .camera-box { background: #000; border-radius: 14px; margin: 6px 0; min-height: 240px; position: relative; overflow: hidden; border: 3px solid #6366f1; }
-        #reader { width: 100%; border-radius: 11px; overflow: hidden; }
-        #reader video { border-radius: 11px; object-fit: cover; }
-        
-        .scanner-status { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; text-align: center; z-index: 10; pointer-events: none; background: linear-gradient(transparent, rgba(0,0,0,0.8)); }
-        .scanner-status .ready { color: white; font-size: 11px; font-weight: 600; }
-        .dot { display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; animation: pulse-dot 1.5s infinite; margin-right: 6px; }
-        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
-        
-        /* FLIP BUTTON */
-        .camera-controls { position: absolute; top: 8px; right: 8px; z-index: 20; display: flex; gap: 5px; }
-        .ctrl-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.5); border: none; color: white; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .ctrl-btn:active { background: rgba(255,255,255,0.4); }
-        
-        /* FLASH */
-        .flash-overlay { position: fixed; top:0;left:0;width:100%;height:100%;background:white;z-index:9999;pointer-events:none;opacity:0; }
-        .flash-overlay.show { opacity:0.6; }
-        
-        /* TABS */
-        .tabs { display: flex; gap: 4px; margin-bottom: 8px; background: #f1f5f9; border-radius: 10px; padding: 3px; }
-        .tab { flex: 1; padding: 8px; border: none; border-radius: 8px; background: transparent; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 11px; color: #94a3b8; transition: all 0.2s; }
-        .tab.active { background: white; color: #6366f1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        
-        /* MANUAL INPUT */
-        .manual-box { display: none; }
-        .manual-box.active { display: block; }
-        .input-group { margin-bottom: 8px; }
-        .input-group input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; }
-        .input-group input:focus { outline: none; border-color: #6366f1; }
-        
-        /* NOTIF */
-        .notif-area { margin-top: 8px; }
-        .notif-area h3 { font-size: 11px; color: #1e293b; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
-        .live { width: 6px; height: 6px; background: #10b981; border-radius: 50%; animation: blink 1s infinite; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-        
-        .notif-list { list-style: none; max-height: 160px; overflow-y: auto; }
-        .notif-list li { padding: 8px 10px; border-radius: 8px; margin-bottom: 3px; display: flex; align-items: center; gap: 8px; font-size: 11px; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-        
-        .notif-list li.success { background: #ecfdf5; border-left: 3px solid #10b981; }
-        .notif-list li.error { background: #fef2f2; border-left: 3px solid #ef4444; }
-        .notif-list li.warning { background: #fffbeb; border-left: 3px solid #f59e0b; }
-        
-        .notif-list .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
-        .notif-list li.error .avatar { background: #ef4444; }
-        .notif-list li.warning .avatar { background: #f59e0b; }
-        .notif-list .info { flex: 1; min-width: 0; }
-        .notif-list .nama { font-weight: 600; color: #1e293b; }
-        .notif-list .jabatan { font-size: 9px; color: #6366f1; font-weight: 500; }
-        .notif-list .pesan { font-size: 9px; color: #64748b; }
-        .notif-list .waktu { font-size: 8px; color: #94a3b8; }
-        .notif-list .icon-status { font-size: 16px; flex-shrink: 0; }
-        .empty-notif { text-align: center; color: #94a3b8; font-size: 10px; padding: 10px; }
-        
-        /* BUTTONS */
-        .btn { display: block; width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; margin: 4px 0; transition: all 0.2s; }
-        .btn:active { transform: scale(0.97); }
-        .btn-camera { background: linear-gradient(135deg,#10b981,#059669); color: white; font-size: 14px; padding: 13px; }
-        .btn-primary { background: #6366f1; color: white; }
-        .btn-outline { background: white; color: #6366f1; border: 2px solid #e2e8f0; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;padding:10px;display:flex;align-items:center;justify-content:center}
+        .container{background:rgba(255,255,255,0.98);border-radius:20px;padding:15px;width:100%;max-width:430px;box-shadow:0 25px 80px rgba(0,0,0,0.4);max-height:98vh;overflow-y:auto}
+        .header{text-align:center;margin-bottom:8px}
+        .header .icon{font-size:34px}
+        .header h1{font-size:17px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .header p{color:#94a3b8;font-size:11px}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+        .stat-box{text-align:center;padding:8px 4px;border-radius:10px;background:#f8fafc}
+        .stat-box .num{font-size:16px;font-weight:700}
+        .stat-box .label{font-size:7px;color:#94a3b8;text-transform:uppercase}
+        .stat-total .num{color:#6366f1}.stat-hadir .num{color:#10b981}.stat-belum .num{color:#f59e0b}.stat-persen .num{color:#3b82f6}
+        .progress-wrap{background:#f1f5f9;border-radius:6px;height:5px;margin-bottom:8px;overflow:hidden}
+        .progress-bar{height:100%;background:linear-gradient(90deg,#10b981,#6366f1);border-radius:6px;width:0}
+        .tabs{display:flex;gap:4px;margin-bottom:8px;background:#f1f5f9;border-radius:10px;padding:3px}
+        .tab{flex:1;padding:10px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-family:inherit;font-weight:600;font-size:11px;color:#94a3b8;transition:all .2s}
+        .tab.active{background:#fff;color:#6366f1;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+        .camera-box{background:#000;border-radius:14px;margin:6px 0;min-height:240px;position:relative;overflow:hidden;border:3px solid #6366f1;display:none}
+        #reader{width:100%;border-radius:11px;overflow:hidden}#reader video{border-radius:11px;object-fit:cover}
+        .scanner-status{position:absolute;bottom:0;left:0;right:0;padding:10px;text-align:center;z-index:10;pointer-events:none;background:linear-gradient(transparent,rgba(0,0,0,0.8))}
+        .scanner-status .ready{color:#fff;font-size:11px;font-weight:600}
+        .dot{display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;animation:pulse-dot 1.5s infinite;margin-right:6px}
+        @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+        .camera-controls{position:absolute;top:8px;right:8px;z-index:20;display:flex;gap:5px}
+        .ctrl-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+        .ctrl-btn:active{background:rgba(255,255,255,0.4)}
+        .flash-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;pointer-events:none;opacity:0}
+        .flash-overlay.show{opacity:0.6}
+        .manual-box{display:none;padding:10px 0}
+        .manual-box.active{display:block}
+        .input-group{margin-bottom:8px}
+        .input-group input{width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:inherit}
+        .input-group input:focus{outline:none;border-color:#6366f1}
+        .notif-area{margin-top:8px}
+        .notif-area h3{font-size:11px;color:#1e293b;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+        .live{width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        .notif-list{list-style:none;max-height:160px;overflow-y:auto}
+        .notif-list li{padding:8px 10px;border-radius:8px;margin-bottom:3px;display:flex;align-items:center;gap:8px;font-size:11px;animation:slideIn .3s ease}
+        @keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+        .notif-list li.success{background:#ecfdf5;border-left:3px solid #10b981}
+        .notif-list li.error{background:#fef2f2;border-left:3px solid #ef4444}
+        .notif-list li.warning{background:#fffbeb;border-left:3px solid #f59e0b}
+        .notif-list .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+        .notif-list li.error .avatar{background:#ef4444}.notif-list li.warning .avatar{background:#f59e0b}
+        .notif-list .info{flex:1;min-width:0}.notif-list .nama{font-weight:600;color:#1e293b}
+        .notif-list .jabatan{font-size:9px;color:#6366f1;font-weight:500}.notif-list .pesan{font-size:9px;color:#64748b}.notif-list .waktu{font-size:8px;color:#94a3b8}.notif-list .icon-status{font-size:16px;flex-shrink:0}
+        .empty-notif{text-align:center;color:#94a3b8;font-size:10px;padding:10px}
+        .btn{display:block;width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin:4px 0;transition:all .2s}
+        .btn:active{transform:scale(0.97)}.btn-camera{background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14px;padding:13px}
+        .btn-primary{background:#6366f1;color:#fff}.btn-outline{background:#fff;color:#6366f1;border:2px solid #e2e8f0}
+        .info-box{background:#d1ecf1;color:#0c5460;padding:10px;border-radius:8px;font-size:11px;margin-bottom:10px}
+        .result-text{text-align:center;font-size:12px;margin-top:8px}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="icon">📱</div>
-            <h1>Absensi QR</h1>
-            <p>Scan QR · Flip Kamera · Input Manual</p>
-        </div>
-        
-        <!-- STATS -->
-        <div class="stats-grid">
-            <div class="stat-box stat-total"><div class="num" id="totalPeserta">0</div><div class="label">Peserta</div></div>
-            <div class="stat-box stat-hadir"><div class="num" id="totalHadir">0</div><div class="label">Hadir</div></div>
-            <div class="stat-box stat-belum"><div class="num" id="totalBelum">0</div><div class="label">Belum</div></div>
-            <div class="stat-box stat-persen"><div class="num" id="persentase">0%</div><div class="label">% Hadir</div></div>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-        
-        <!-- TABS -->
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('scan')" id="tabScan">📸 Scan QR</button>
-            <button class="tab" onclick="switchTab('manual')" id="tabManual">⌨️ Input NIP</button>
-        </div>
-        
-        <!-- SCAN MODE -->
-        <div id="scanSection">
-            <div class="camera-box" id="cameraBox">
-                <div id="reader"></div>
-                <div class="camera-controls">
-                    <button class="ctrl-btn" onclick="flipCamera()" title="Flip Kamera">🔄</button>
-                </div>
-                <div class="scanner-status"><div class="ready" id="scannerStatus"><span class="dot"></span> Arahkan QR</div></div>
-            </div>
-            <button id="btnCamera" class="btn btn-camera" onclick="startCamera()">📸 Mulai Kamera</button>
-            <button id="btnRetry" class="btn btn-outline" onclick="startCamera()" style="display:none;">🔄 Ulangi</button>
-        </div>
-        
-        <!-- MANUAL MODE -->
-        <div id="manualSection" class="manual-box">
-            <div style="background:#d1ecf1;color:#0c5460;padding:10px;border-radius:8px;font-size:11px;margin-bottom:10px;">
-                ⚠️ Jika QR error/tidak terbaca, masukkan NIP manual
-            </div>
-            <div class="input-group"><input type="text" id="nipManual" placeholder="Masukkan NIP (contoh: 001)" autocomplete="off" /></div>
-            <button class="btn btn-primary" onclick="manualCheckIn()">✅ Absen Manual</button>
-            <p id="manualResult" style="text-align:center;font-size:12px;margin-top:8px;"></p>
-        </div>
-        
-        <!-- NOTIF -->
-        <div class="notif-area">
-            <h3><span class="live"></span> Notifikasi</h3>
-            <ul class="notif-list" id="notifList"><li class="empty-notif">📭 Menunggu...</li></ul>
-        </div>
+<div class="container">
+    <div class="header"><div class="icon">📱</div><h1>Absensi QR</h1><p>Scan QR · Flip Kamera · Input NIP</p></div>
+    
+    <div class="stats-grid">
+        <div class="stat-box stat-total"><div class="num" id="totalPeserta">0</div><div class="label">Peserta</div></div>
+        <div class="stat-box stat-hadir"><div class="num" id="totalHadir">0</div><div class="label">Hadir</div></div>
+        <div class="stat-box stat-belum"><div class="num" id="totalBelum">0</div><div class="label">Belum</div></div>
+        <div class="stat-box stat-persen"><div class="num" id="persentase">0%</div><div class="label">% Hadir</div></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('scan')" id="tabScan">📸 Scan QR</button>
+        <button class="tab" onclick="switchTab('manual')" id="tabManual">⌨️ Input NIP</button>
     </div>
     
-    <div class="flash-overlay" id="flashOverlay"></div>
+    <div id="scanSection">
+        <div class="camera-box" id="cameraBox"><div id="reader"></div>
+            <div class="camera-controls"><button class="ctrl-btn" onclick="flipCamera()" title="Flip Kamera">🔄</button></div>
+            <div class="scanner-status"><div class="ready" id="scannerStatus"><span class="dot"></span>Arahkan QR</div></div>
+        </div>
+        <button id="btnCamera" class="btn btn-camera" onclick="startCamera()">📸 Mulai Kamera</button>
+        <button id="btnRetry" class="btn btn-outline" onclick="startCamera()" style="display:none">🔄 Ulangi</button>
+    </div>
+    
+    <div class="manual-box" id="manualSection">
+        <div class="info-box">⚠️ Jika QR error/tidak terbaca, masukkan NIP</div>
+        <div class="input-group"><input type="text" id="nipManual" placeholder="Masukkan NIP (contoh: 001)" autocomplete="off"></div>
+        <button class="btn btn-primary" onclick="manualCheckIn()">✅ Absen Manual</button>
+        <p class="result-text" id="manualResult"></p>
+    </div>
+    
+    <div class="notif-area"><h3><span class="live"></span>Notifikasi</h3><ul class="notif-list" id="notifList"><li class="empty-notif">📭 Menunggu...</li></ul></div>
+</div>
+<div class="flash-overlay" id="flashOverlay"></div>
 
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzxSCaZecBS6Dfq6Y0WwZMSjjSqUWMcS084fgUqef_8dfFzAzNpozPv8WgmQEZtC9Gg/exec';
-        
-        let scanner = null;
-        let isProcessing = false;
-        let notifList = [];
-        let pesertaCache = {};
-        let currentFacingMode = 'environment'; // Kamera belakang default
-        
-        function flash() { const el = document.getElementById('flashOverlay'); el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 150); }
-        
-        function callAPI(action, params) {
-            return new Promise((resolve, reject) => {
-                const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-                window[cb] = r => { delete window[cb]; const s = document.getElementById(cb); if (s) s.remove(); resolve(r); };
-                const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
-                const url = API_URL + '?action=' + action + '&callback=' + cb + '&' + qs;
-                const s = document.createElement('script'); s.id = cb; s.src = url;
-                s.onerror = () => { delete window[cb]; reject(new Error('Network')); };
-                document.body.appendChild(s);
-                setTimeout(() => { if (window[cb]) { delete window[cb]; reject(new Error('Timeout')); } }, 10000);
-            });
-        }
-        
-        // STATS
-        async function updateStats() {
-            try {
-                const r = await callAPI('getStats', {});
-                if (r.success) {
-                    document.getElementById('totalPeserta').textContent = r.totalPeserta || 0;
-                    document.getElementById('totalHadir').textContent = r.totalHadir || 0;
-                    document.getElementById('totalBelum').textContent = r.totalBelum || 0;
-                    document.getElementById('persentase').textContent = (r.persentase || 0) + '%';
-                    document.getElementById('progressBar').style.width = (r.persentase || 0) + '%';
-                }
-            } catch(e) {}
-        }
-        
-        async function loadPesertaCache() {
-            try {
-                const r = await callAPI('getPeserta', {});
-                if (r.success) { pesertaCache = {}; r.data.forEach(p => { pesertaCache[p.nip] = { nama: p.nama, jabatan: p.jabatan || '' }; }); }
-            } catch(e) {}
-        }
-        
-        function addNotif(nama, jabatan, msg, type) {
-            const waktu = new Date().toLocaleTimeString('id-ID');
-            if (notifList.length > 0 && notifList[0].nama === nama && notifList[0].type === type) return;
-            notifList.unshift({ nama, jabatan: jabatan || '', msg, waktu, type });
-            if (notifList.length > 50) notifList = notifList.slice(0, 50);
-            renderNotif();
-        }
-        
-        function renderNotif() {
-            const list = document.getElementById('notifList');
-            if (notifList.length === 0) { list.innerHTML = '<li class="empty-notif">📭 Menunggu...</li>'; return; }
-            list.innerHTML = notifList.map(n => {
-                const icon = n.type === 'success' ? '✅' : n.type === 'warning' ? '⚠️' : '❌';
-                return `<li class="${n.type}"><div class="avatar">${n.nama?n.nama.charAt(0):'?'}</div><div class="info"><div class="nama">${n.nama||'-'}</div>${n.jabatan?'<div class="jabatan">'+n.jabatan+'</div>':''}<div class="pesan">${n.msg}</div><div class="waktu">${n.waktu}</div></div><div class="icon-status">${icon}</div></li>`;
-            }).join('');
-        }
-        
-        function resumeScanner() {
-            isProcessing = false;
-            document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> Arahkan QR';
-            if (scanner) scanner.resume().catch(() => startCamera());
-        }
-        
-        // TABS
-        function switchTab(tab) {
-            document.getElementById('tabScan').className = tab === 'scan' ? 'tab active' : 'tab';
-            document.getElementById('tabManual').className = tab === 'manual' ? 'tab active' : 'tab';
-            document.getElementById('scanSection').style.display = tab === 'scan' ? 'block' : 'none';
-            document.getElementById('manualSection').style.display = tab === 'manual' ? 'block' : 'none';
-            document.getElementById('manualSection').classList.toggle('active', tab === 'manual');
-            if (tab === 'manual' && scanner) { scanner.stop().catch(()=>{}); scanner = null; }
-            if (tab === 'scan') { document.getElementById('btnCamera').style.display = 'block'; }
-        }
-        
-        // FLIP CAMERA
-        async function flipCamera() {
-            if (!scanner) return;
-            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-            document.getElementById('scannerStatus').innerHTML = '🔄 Flip...';
-            
-            try { await scanner.stop(); await scanner.clear(); } catch(e) {}
-            
-            document.getElementById('reader').innerHTML = '';
-            scanner = new Html5Qrcode("reader");
-            
-            try {
-                await scanner.start(
-                    { facingMode: currentFacingMode },
-                    { fps: 30, qrbox: { width: 250, height: 250 } },
-                    text => { scanner.pause(); autoAbsen(text); },
-                    () => {}
-                );
-                document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> ' + (currentFacingMode === 'user' ? 'Depan' : 'Belakang');
-            } catch(e) {
-                document.getElementById('scannerStatus').innerHTML = '❌ Gagal flip';
-            }
-        }
-        
-        // AUTO ABSEN
-        async function autoAbsen(decodedText) {
-            if (isProcessing) return;
-            isProcessing = true;
-            flash();
-            document.getElementById('scannerStatus').innerHTML = '⏳...';
-            
-            let nip = '', nama = '';
-            try {
-                const decoded = JSON.parse(atob(decodedText));
-                if (decoded.type === 'personal_qr' && decoded.nip && decoded.nama) { nip = decoded.nip; nama = decoded.nama; }
-                else { addNotif('?','','QR tidak valid','error'); updateStats(); resumeScanner(); return; }
-            } catch(e) { addNotif('?','','QR error','error'); updateStats(); resumeScanner(); return; }
-            
-            // Cek di cache
-            let jabatan = '';
-            if (pesertaCache[nip]) { jabatan = pesertaCache[nip].jabatan; }
-            
-            try {
-                const result = await callAPI('checkIn', { nip, nama, lat: '', lng: '' });
-                if (result.success) { addNotif(nama, jabatan, result.message, 'success'); }
-                else if (result.alreadyAbsen) { addNotif(nama, jabatan, 'Sudah absen', 'warning'); }
-                else { addNotif(nama, jabatan, result.message, 'error'); }
-                updateStats();
-            } catch(e) { addNotif(nama, '', 'Gagal', 'error'); updateStats(); }
-            
-            setTimeout(resumeScanner, 700);
-        }
-        
-        // MANUAL CHECKIN
-        async function manualCheckIn() {
-            const nip = document.getElementById('nipManual').value.trim();
-            if (!nip) { document.getElementById('manualResult').innerHTML = '<span style="color:red;">Masukkan NIP!</span>'; return; }
-            
-            // Cari nama dari cache
-            let nama = '';
-            let jabatan = '';
-            if (pesertaCache[nip]) { nama = pesertaCache[nip].nama; jabatan = pesertaCache[nip].jabatan; }
-            else {
-                // Coba ambil dari API
-                try {
-                    const r = await callAPI('getPeserta', {});
-                    if (r.success) {
-                        const found = r.data.find(p => p.nip === nip);
-                        if (found) { nama = found.nama; jabatan = found.jabatan || ''; }
-                    }
-                } catch(e) {}
-            }
-            
-            if (!nama) { document.getElementById('manualResult').innerHTML = '<span style="color:red;">NIP tidak ditemukan!</span>'; return; }
-            
-            document.getElementById('manualResult').innerHTML = '⏳ Memproses...';
-            
-            try {
-                const result = await callAPI('checkIn', { nip, nama, lat: '', lng: '' });
-                if (result.success) {
-                    addNotif(nama, jabatan, result.message, 'success');
-                    document.getElementById('manualResult').innerHTML = '<span style="color:green;">✅ ' + result.message + '</span>';
-                } else if (result.alreadyAbsen) {
-                    addNotif(nama, jabatan, 'Sudah absen', 'warning');
-                    document.getElementById('manualResult').innerHTML = '<span style="color:orange;">⚠️ Sudah absen</span>';
-                } else {
-                    addNotif(nama, jabatan, result.message, 'error');
-                    document.getElementById('manualResult').innerHTML = '<span style="color:red;">❌ ' + result.message + '</span>';
-                }
-                document.getElementById('nipManual').value = '';
-                updateStats();
-            } catch(e) {
-                document.getElementById('manualResult').innerHTML = '<span style="color:red;">❌ Gagal</span>';
-            }
-        }
-        
-        // CAMERA
-        async function startCamera() {
-            document.getElementById('btnCamera').style.display = 'none';
-            document.getElementById('btnRetry').style.display = 'none';
-            document.getElementById('cameraBox').style.display = 'block';
-            document.getElementById('scannerStatus').innerHTML = '⏳ Membuka...';
-            
-            if (scanner) { try { await scanner.stop(); await scanner.clear(); } catch(e) {} scanner = null; }
-            document.getElementById('reader').innerHTML = '';
-            
-            if (!navigator.mediaDevices?.getUserMedia) { addNotif('System','','No camera','error'); document.getElementById('btnRetry').style.display = 'block'; return; }
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
-                stream.getTracks().forEach(t => t.stop());
-                
-                scanner = new Html5Qrcode("reader");
-                await scanner.start(
-                    { facingMode: currentFacingMode },
-                    { fps: 30, qrbox: { width: 250, height: 250 } }, // FPS 30 = CEPAT
-                    text => { scanner.pause(); autoAbsen(text); },
-                    () => {}
-                );
-                document.getElementById('scannerStatus').innerHTML = '<span class="dot"></span> ' + (currentFacingMode === 'user' ? 'Depan' : 'Belakang');
-            } catch(err) {
-                addNotif('System','','Kamera gagal','error');
-                document.getElementById('cameraBox').style.display = 'none';
-                document.getElementById('btnRetry').style.display = 'block';
-            }
-        }
-        
-        // INIT
-        window.addEventListener('load', async () => {
-            await loadPesertaCache();
-            updateStats();
-            if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) setTimeout(startCamera, 500);
-            setInterval(updateStats, 15000);
-        });
-        
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) { if (scanner) scanner.pause(); }
-            else { if (scanner && !isProcessing) { scanner.resume().catch(() => startCamera()); updateStats(); } }
-        });
-    </script>
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbzxSCaZecBS6Dfq6Y0WwZMSjjSqUWMcS084fgUqef_8dfFzAzNpozPv8WgmQEZtC9Gg/exec';
+let scanner=null,isProcessing=!1,notifList=[],pesertaCache={},currentFacingMode='environment';
+
+function flash(){let e=document.getElementById('flashOverlay');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),150)}
+
+function callAPI(e,t){return new Promise((r,a)=>{let n='cb_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);window[n]=e=>{delete window[n];let t=document.getElementById(n);t&&t.remove();r(e)};let s=Object.entries(t).map(([e,t])=>e+'='+encodeURIComponent(t)).join('&');let o=API_URL+'?action='+e+'&callback='+n+'&'+s,i=document.createElement('script');i.id=n;i.src=o;i.onerror=()=>{delete window[n];a(new Error('Network'))};document.body.appendChild(i);setTimeout(()=>{window[n]&&(delete window[n],a(new Error('Timeout')))},10000)})}
+
+async function updateStats(){try{let e=await callAPI('getStats',{});e.success&&(document.getElementById('totalPeserta').textContent=e.totalPeserta||0,document.getElementById('totalHadir').textContent=e.totalHadir||0,document.getElementById('totalBelum').textContent=e.totalBelum||0,document.getElementById('persentase').textContent=(e.persentase||0)+'%',document.getElementById('progressBar').style.width=(e.persentase||0)+'%')}catch(e){}}
+
+async function loadPesertaCache(){try{let e=await callAPI('getPeserta',{});e.success&&(pesertaCache={},e.data.forEach(e=>{pesertaCache[e.nip]={nama:e.nama,jabatan:e.jabatan||''}}))}catch(e){}}
+
+function addNotif(e,t,r,a){let n=new Date().toLocaleTimeString('id-ID');notifList.length>0&&notifList[0].nama===e&&notifList[0].type===a||(notifList.unshift({nama:e,jabatan:t||'',msg:r,waktu:n,type:a}),notifList.length>50&&(notifList=notifList.slice(0,50)),renderNotif())}
+
+function renderNotif(){let e=document.getElementById('notifList');if(0===notifList.length){e.innerHTML='<li class="empty-notif">📭 Menunggu...</li>';return}e.innerHTML=notifList.map(e=>{let t='success'===e.type?'✅':'warning'===e.type?'⚠️':'❌';return`<li class="${e.type}"><div class="avatar">${e.nama?e.nama.charAt(0):'?'}</div><div class="info"><div class="nama">${e.nama||'-'}</div>${e.jabatan?'<div class="jabatan">'+e.jabatan+'</div>':''}<div class="pesan">${e.msg}</div><div class="waktu">${e.waktu}</div></div><div class="icon-status">${t}</div></li>`}).join('')}
+
+function resumeScanner(){isProcessing=!1;document.getElementById('scannerStatus').innerHTML='<span class="dot"></span>Arahkan QR';scanner&&scanner.resume().catch(()=>startCamera())}
+
+function switchTab(e){document.getElementById('tabScan').className='scan'===e?'tab active':'tab';document.getElementById('tabManual').className='manual'===e?'tab active':'tab';document.getElementById('scanSection').style.display='scan'===e?'block':'none';let t=document.getElementById('manualSection');t.style.display='manual'===e?'block':'none';t.classList.toggle('active','manual'===e);if('manual'===e&&scanner){scanner.stop().catch(()=>{});scanner=null;document.getElementById('cameraBox').style.display='none'}'scan'===e&&(document.getElementById('btnCamera').style.display='block')}
+
+async function flipCamera(){if(!scanner)return;currentFacingMode='environment'===currentFacingMode?'user':'environment';document.getElementById('scannerStatus').innerHTML='🔄 Flip...';try{await scanner.stop();await scanner.clear()}catch(e){}document.getElementById('reader').innerHTML='';scanner=new Html5Qrcode('reader');try{await scanner.start({facingMode:currentFacingMode},{fps:30,qrbox:{width:250,height:250}},e=>{scanner.pause();autoAbsen(e)},()=>{});document.getElementById('scannerStatus').innerHTML='<span class="dot"></span>'+('user'===currentFacingMode?'Depan':'Belakang')}catch(e){document.getElementById('scannerStatus').innerHTML='❌ Gagal flip'}}
+
+async function autoAbsen(e){if(isProcessing)return;isProcessing=!0;flash();document.getElementById('scannerStatus').innerHTML='⏳...';let t='',r='';try{let a=JSON.parse(atob(e));if('personal_qr'===a.type&&a.nip&&a.nama){t=a.nip;r=a.nama}else{addNotif('?','','QR tidak valid','error');updateStats();resumeScanner();return}}catch(e){addNotif('?','','QR error','error');updateStats();resumeScanner();return}let a='';pesertaCache[t]&&(a=pesertaCache[t].jabatan);try{let e=await callAPI('checkIn',{nip:t,nama:r,lat:'',lng:''});e.success?addNotif(r,a,e.message,'success'):e.alreadyAbsen?addNotif(r,a,'Sudah absen','warning'):addNotif(r,a,e.message,'error');updateStats()}catch(e){addNotif(r,'','Gagal','error');updateStats()}setTimeout(resumeScanner,700)}
+
+async function manualCheckIn(){let e=document.getElementById('nipManual').value.trim();if(!e){document.getElementById('manualResult').innerHTML='<span style="color:red">Masukkan NIP!</span>';return}let t='',r='';if(pesertaCache[e]){t=pesertaCache[e].nama;r=pesertaCache[e].jabatan}else{try{let a=await callAPI('getPeserta',{});if(a.success){let n=a.data.find(t=>t.nip===e);n&&(t=n.nama,r=n.jabatan||'')}}catch(e){}}if(!t){document.getElementById('manualResult').innerHTML='<span style="color:red">NIP tidak ditemukan!</span>';return}document.getElementById('manualResult').innerHTML='⏳ Memproses...';try{let a=await callAPI('checkIn',{nip:e,nama:t,lat:'',lng:''});a.success?(addNotif(t,r,a.message,'success'),document.getElementById('manualResult').innerHTML='<span style="color:green">✅ '+a.message+'</span>'):a.alreadyAbsen?(addNotif(t,r,'Sudah absen','warning'),document.getElementById('manualResult').innerHTML='<span style="color:orange">⚠️ Sudah absen</span>'):(addNotif(t,r,a.message,'error'),document.getElementById('manualResult').innerHTML='<span style="color:red">❌ '+a.message+'</span>');document.getElementById('nipManual').value='';updateStats()}catch(e){document.getElementById('manualResult').innerHTML='<span style="color:red">❌ Gagal</span>'}}
+
+async function startCamera(){document.getElementById('btnCamera').style.display='none';document.getElementById('btnRetry').style.display='none';document.getElementById('cameraBox').style.display='block';document.getElementById('scannerStatus').innerHTML='⏳ Membuka...';scanner&&(await scanner.stop().catch(()=>{}),await scanner.clear().catch(()=>{}),scanner=null);document.getElementById('reader').innerHTML='';if(!navigator.mediaDevices?.getUserMedia){addNotif('System','','No camera','error');document.getElementById('btnRetry').style.display='block';return}try{let e=await navigator.mediaDevices.getUserMedia({video:{facingMode:currentFacingMode}});e.getTracks().forEach(e=>e.stop());scanner=new Html5Qrcode('reader');await scanner.start({facingMode:currentFacingMode},{fps:30,qrbox:{width:250,height:250}},e=>{scanner.pause();autoAbsen(e)},()=>{});document.getElementById('scannerStatus').innerHTML='<span class="dot"></span>'+('user'===currentFacingMode?'Depan':'Belakang')}catch(e){addNotif('System','','Kamera gagal','error');document.getElementById('cameraBox').style.display='none';document.getElementById('btnRetry').style.display='block'}}
+
+window.addEventListener('load',async()=>{await loadPesertaCache();updateStats();/Mobi|Android|iPhone/i.test(navigator.userAgent)&&setTimeout(startCamera,500);setInterval(updateStats,15000)});
+
+document.addEventListener('visibilitychange',()=>{document.hidden?scanner&&scanner.pause():scanner&&!isProcessing&&(scanner.resume().catch(()=>startCamera()),updateStats())});
+</script>
 </body>
 </html>
